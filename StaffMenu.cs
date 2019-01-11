@@ -25,7 +25,7 @@ namespace AppointmentSchedulingReservation
         public void ListStaff()
         {
             Console.WriteLine("--- List staff ---");
-            if (!StaffManager.Rooms.Any())
+            if (!StaffManager.Staffs.Any())
             {
                 Console.WriteLine("No items present.");
                 Console.WriteLine();

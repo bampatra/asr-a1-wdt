@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AppointmentSchedulingReservation
 {
     public class StudentMenu : AppointmentSchedulingReservation.UserAbstract, AppointmentSchedulingReservation.IStudent
     {
-
+        private StudentManager StudentManager { get; } = new StudentManager();
 
         public void MenuOption()
         {
@@ -22,7 +23,27 @@ namespace AppointmentSchedulingReservation
         // these methods can be implemented from interface
         public void ListStudents()
         {
+            Console.WriteLine("--- List students ---");
+            if (!StudentManager.Students.Any())
+            {
+                Console.WriteLine("No items present.");
+                Console.WriteLine();
+                return;
+            }
 
+            DisplayStudents(StudentManager.Students);
+
+        }
+
+        private void DisplayStudents(IEnumerable<User> students)
+        {
+            //const string format = "{0,-5}{1,-25}{2}";
+            Console.WriteLine("ID \tName \tEmail");
+            foreach (var x in students)
+            {
+                Console.WriteLine($"{x.UserID} \t\t{x.Name} \t\t{x.Email}");
+            }
+            Console.WriteLine();
         }
 
         public void StaffAvailability()
