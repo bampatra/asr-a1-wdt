@@ -1,53 +1,74 @@
 ﻿using System;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AppointmentSchedulingReservation
 {
-    public class Student : AppointmentSchedulingReservation.User, AppointmentSchedulingReservation.IStudent
+    public class StaffMenu : AppointmentSchedulingReservation.UserAbstract, AppointmentSchedulingReservation.IStaff
     {
+        private StaffManager StaffManager { get; } = new StaffManager();
 
 
         public void MenuOption()
         {
             Console.WriteLine("--------------------------------------------------------");
-            Console.WriteLine("Main menu");
-            Console.WriteLine("\t 1. List students");
-            Console.WriteLine("\t 2. Staff availability");
-            Console.WriteLine("\t 3. Make booking");
-            Console.WriteLine("\t 4. Cancel booking");
+            Console.WriteLine("Staff menu");
+            Console.WriteLine("\t 1. List staff");
+            Console.WriteLine("\t 2. Room availability");
+            Console.WriteLine("\t 3. Create slot");
+            Console.WriteLine("\t 4. Remove slot");
             Console.WriteLine("\t 5. Exit");
             Console.Write("Enter option: ");
         }
 
-        // these methods can be implemented from interface
-        public void ListStudents()
+  
+        public void ListStaff()
         {
-
-        }
-
-        public void StaffAvailability()
-        {
-            bool repeat = true;
-            while (repeat == true)
+            Console.WriteLine("--- List staff ---");
+            if (!StaffManager.Rooms.Any())
             {
-                Console.WriteLine("--- Staff availibility ---");
-                Console.Write("Enter date for staff availability (dd-mm-yyyy): ");
-                string dateInput = Console.ReadLine();
-                Console.Write("Enter staff ID: ");
-                string staffInput = Console.ReadLine();
-
-                // Validations
-                if (base.DateValidation(dateInput) == true &&
-                    base.StaffValidation(staffInput) == true)
-                {
-                    // Show staff
-                    repeat = false;
-                }
+                Console.WriteLine("No items present.");
+                Console.WriteLine();
+                return;
             }
 
+            DisplayStaff(StaffManager.Staffs);
+
         }
 
-        public void MakeBooking()
+        private void DisplayStaff(IEnumerable<User> staffs)
+        {
+            //const string format = "{0,-5}{1,-25}{2}";
+            Console.WriteLine("ID \t\tName \t\tEmail");
+            foreach (var x in staffs)
+            {
+                Console.WriteLine($"{x.UserID} \t\t{x.Name} \t\t{x.Email}");
+            }
+            Console.WriteLine();
+        }
+
+        public void RoomAvailability()
+        {
+            bool repeat = true;
+
+            while (repeat == true)
+            {
+                Console.Write("Enter date for room availability (dd-mm-yyyy): ");
+                string dateInput = Console.ReadLine();
+
+                if (base.DateValidation(dateInput) == true)
+                {
+                    // show availabilites
+                    repeat = false;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input, please re-type data");
+                }
+            }
+        }
+
+        public void CreateSlot()
         {
             bool repeat = true;
 
@@ -56,17 +77,18 @@ namespace AppointmentSchedulingReservation
                 Console.WriteLine("--- Create slot ---");
                 Console.Write("Enter room name: ");
                 string roomInput = Console.ReadLine();
-                Console.Write("Enter date for slots (dd-mm-yyyy): ");
+                Console.Write("Enter date for slot (dd-mm-yyyy): ");
                 string dateInput = Console.ReadLine();
-                Console.Write("Enter time for slots (hh:mm): ");
+                Console.Write("Enter time for slot (hh:mm): ");
                 string timeInput = Console.ReadLine();
-                Console.Write("Enter student ID: ");
-                string studentInput = Console.ReadLine();
+                Console.Write("Enter staff ID: ");
+                string staffInput = Console.ReadLine();
 
                 // Validations
-                if (base.DateValidation(dateInput) == true &&
+
+                if (base.DateValidation(dateInput) == true && 
                     base.TimeValidation(timeInput) == true &&
-                    base.StudentValidation(studentInput) == true)
+                    base.StaffValidation(staffInput) == true)
                 {
                     // If all inputs are valid, then add to database
                     Console.WriteLine("Slot created successfully");
@@ -76,17 +98,20 @@ namespace AppointmentSchedulingReservation
                 {
                     Console.WriteLine("Invalid input, please re-type data");
                 }
-            }
 
+
+
+            }
         }
 
-        public void CancelBooking()
+        public void RemoveSlot()
         {
             bool repeat = true;
 
             while (repeat == true)
             {
-                Console.WriteLine("--- Cancel booking ---");
+
+                Console.WriteLine("--- Remove slot ---");
                 Console.Write("Enter room name: ");
                 string roomInput = Console.ReadLine();
                 Console.Write("Enter date for slot (dd-mm-yyyy): ");
@@ -98,7 +123,7 @@ namespace AppointmentSchedulingReservation
                 if (base.DateValidation(dateInput) == true &&
                     base.TimeValidation(timeInput) == true)
                 {
-                    // If all inputs are valid, then remove from database
+                    // Checks if slot exists, then remove from database
                     Console.WriteLine("Slot removed successfully");
                     repeat = false;
                 }
@@ -108,10 +133,10 @@ namespace AppointmentSchedulingReservation
                 }
 
             }
-
         }
 
-        public void StudentMenu()
+
+        public void ShowStaffMenu()
         {
             bool repeat = true;
             while (repeat == true)
@@ -121,16 +146,16 @@ namespace AppointmentSchedulingReservation
                 switch (input)
                 {
                     case "1":
-                        ListStudents();
+                        ListStaff();
                         break;
                     case "2":
-                        StaffAvailability();
+                        RoomAvailability();
                         break;
                     case "3":
-                        MakeBooking();
+                        CreateSlot();
                         break;
                     case "4":
-                        CancelBooking();
+                        RemoveSlot();
                         break;
                     case "5":
                         repeat = false;

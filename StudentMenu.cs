@@ -1,54 +1,53 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace AppointmentSchedulingReservation
 {
-    public class Staff : AppointmentSchedulingReservation.User, AppointmentSchedulingReservation.IStaff
+    public class StudentMenu : AppointmentSchedulingReservation.UserAbstract, AppointmentSchedulingReservation.IStudent
     {
-        private StaffManager StaffManager { get; } = new StaffManager();
 
 
         public void MenuOption()
         {
             Console.WriteLine("--------------------------------------------------------");
-            Console.WriteLine("Staff menu");
-            Console.WriteLine("\t 1. List staff");
-            Console.WriteLine("\t 2. Room availability");
-            Console.WriteLine("\t 3. Create slot");
-            Console.WriteLine("\t 4. Remove slot");
+            Console.WriteLine("Main menu");
+            Console.WriteLine("\t 1. List students");
+            Console.WriteLine("\t 2. Staff availability");
+            Console.WriteLine("\t 3. Make booking");
+            Console.WriteLine("\t 4. Cancel booking");
             Console.WriteLine("\t 5. Exit");
             Console.Write("Enter option: ");
         }
 
         // these methods can be implemented from interface
-        public void ListStaff()
+        public void ListStudents()
         {
 
         }
 
-        public void RoomAvailability()
+        public void StaffAvailability()
         {
             bool repeat = true;
-
             while (repeat == true)
             {
-                Console.Write("Enter date for room availability (dd-mm-yyyy): ");
+                Console.WriteLine("--- Staff availibility ---");
+                Console.Write("Enter date for staff availability (dd-mm-yyyy): ");
                 string dateInput = Console.ReadLine();
+                Console.Write("Enter staff ID: ");
+                string staffInput = Console.ReadLine();
 
-                if (base.DateValidation(dateInput) == true)
+                // Validations
+                if (base.DateValidation(dateInput) == true &&
+                    base.StaffValidation(staffInput) == true)
                 {
-                    // show availabilites
+                    // Show staff
                     repeat = false;
                 }
-                else
-                {
-                    Console.WriteLine("Invalid input, please re-type data");
-                }
             }
+
         }
 
-        public void CreateSlot()
+        public void MakeBooking()
         {
             bool repeat = true;
 
@@ -57,18 +56,17 @@ namespace AppointmentSchedulingReservation
                 Console.WriteLine("--- Create slot ---");
                 Console.Write("Enter room name: ");
                 string roomInput = Console.ReadLine();
-                Console.Write("Enter date for slot (dd-mm-yyyy): ");
+                Console.Write("Enter date for slots (dd-mm-yyyy): ");
                 string dateInput = Console.ReadLine();
-                Console.Write("Enter time for slot (hh:mm): ");
+                Console.Write("Enter time for slots (hh:mm): ");
                 string timeInput = Console.ReadLine();
-                Console.Write("Enter staff ID: ");
-                string staffInput = Console.ReadLine();
+                Console.Write("Enter student ID: ");
+                string studentInput = Console.ReadLine();
 
                 // Validations
-
-                if (base.DateValidation(dateInput) == true && 
+                if (base.DateValidation(dateInput) == true &&
                     base.TimeValidation(timeInput) == true &&
-                    base.StaffValidation(staffInput) == true)
+                    base.StudentValidation(studentInput) == true)
                 {
                     // If all inputs are valid, then add to database
                     Console.WriteLine("Slot created successfully");
@@ -78,20 +76,17 @@ namespace AppointmentSchedulingReservation
                 {
                     Console.WriteLine("Invalid input, please re-type data");
                 }
-
-
-
             }
+
         }
 
-        public void RemoveSlot()
+        public void CancelBooking()
         {
             bool repeat = true;
 
             while (repeat == true)
             {
-
-                Console.WriteLine("--- Remove slot ---");
+                Console.WriteLine("--- Cancel booking ---");
                 Console.Write("Enter room name: ");
                 string roomInput = Console.ReadLine();
                 Console.Write("Enter date for slot (dd-mm-yyyy): ");
@@ -103,7 +98,7 @@ namespace AppointmentSchedulingReservation
                 if (base.DateValidation(dateInput) == true &&
                     base.TimeValidation(timeInput) == true)
                 {
-                    // Checks if slot exists, then remove from database
+                    // If all inputs are valid, then remove from database
                     Console.WriteLine("Slot removed successfully");
                     repeat = false;
                 }
@@ -113,10 +108,10 @@ namespace AppointmentSchedulingReservation
                 }
 
             }
+
         }
 
-
-        public void StaffMenu()
+        public void ShowStudentMenu()
         {
             bool repeat = true;
             while (repeat == true)
@@ -126,16 +121,16 @@ namespace AppointmentSchedulingReservation
                 switch (input)
                 {
                     case "1":
-                        ListStaff();
+                        ListStudents();
                         break;
                     case "2":
-                        RoomAvailability();
+                        StaffAvailability();
                         break;
                     case "3":
-                        CreateSlot();
+                        MakeBooking();
                         break;
                     case "4":
-                        RemoveSlot();
+                        CancelBooking();
                         break;
                     case "5":
                         repeat = false;

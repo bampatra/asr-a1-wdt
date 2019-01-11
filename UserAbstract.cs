@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace AppointmentSchedulingReservation
 {
-    public abstract class User
+    public abstract class UserAbstract
     {
         protected bool DateValidation(string date)
         {

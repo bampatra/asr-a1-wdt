@@ -13,8 +13,9 @@ namespace AppointmentSchedulingReservation
 
         private static void Main(string[] args)
         {
-            Staff staff = new Staff();
-            Student student = new Student();
+            StaffMenu staff = new StaffMenu();
+            StudentMenu student = new StudentMenu();
+            MainMenu mainmenu = new MainMenu();
             bool repeat = true;
 
             Console.WriteLine("--------------------------------------------------------");
@@ -29,16 +30,16 @@ namespace AppointmentSchedulingReservation
                 switch (input)
                 {
                     case "1":
-                        ListRooms();
+                        mainmenu.ListRooms();
                         break;
                     case "2":
-                        ListSlots();
+                        mainmenu.ListSlots();
                         break;
                     case "3":
-                        staff.StaffMenu();
+                        staff.ShowStaffMenu();
                         break;
                     case "4":
-                        student.StudentMenu();
+                        student.ShowStudentMenu();
                         break;
                     case "5":
                         Console.WriteLine("Terminating ASR");
@@ -65,41 +66,6 @@ namespace AppointmentSchedulingReservation
 
         }
 
-        // these methods can be implemented from interface
-        private static void ListRooms()
-        {
-
-        }
-
-        private static void ListSlots()
-        {
-            bool repeat = true;
-            while (repeat == true)
-            {
-                Console.Write("Enter date for slots (dd-mm-yyyy): ");
-                string dateInput = Console.ReadLine();
-                try
-                {
-                    string[] dateParts = dateInput.Split('-');
-
-                    // create new date from the parts
-                    DateTime testDate = new
-                        DateTime(Convert.ToInt32(dateParts[2]),
-                        Convert.ToInt32(dateParts[1]),
-                        Convert.ToInt32(dateParts[0]));
-
-                    Console.WriteLine(testDate);
-                    repeat = false;
-
-                }
-                catch
-                {
-                    Console.WriteLine("Invalid input!");
-
-                }
-            }
-
-        }
 
 
     }

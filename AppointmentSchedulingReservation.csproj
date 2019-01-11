@@ -17,4 +17,7 @@
     <None Remove=".DS_Store" />
     <None Remove="dbsetting.json" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Models\Student.cs" />
+  </ItemGroup>
 </Project>
