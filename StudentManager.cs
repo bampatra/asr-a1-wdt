@@ -50,5 +50,22 @@ namespace AppointmentSchedulingReservation
                 command.ExecuteNonQuery();
             }
         }
+
+        public void CancelBooking(Slot slot)
+        {
+            using (var connection = Program.ConnectionString.CreateConnection())
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText =
+                    "update Slot set BookedInStudentId = null where " +
+                    "RoomID = @roomID and StartTime = @starttime";
+                command.Parameters.AddWithValue("roomID", slot.RoomID);
+                command.Parameters.AddWithValue("starttime", slot.StartTime);
+
+                command.ExecuteNonQuery();
+            }
+        }
     }
 }

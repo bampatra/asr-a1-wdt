@@ -83,12 +83,13 @@ namespace AppointmentSchedulingReservation
             bool noslot = true;
             //const string format = "{0,-5}{1,-25}{2}";
             Console.WriteLine($"Slots on {DateInput}");
-            Console.WriteLine("Room ID \tStartTime \t\tStaffID \tBookedInStudentID");
+            Console.WriteLine("Room ID \tStart Time \t End Time\tStaff ID \tBookings");
             foreach (var x in slots)
             {
                 if (from <= x.StartTime && x.StartTime <= to)
                 {
-                    Console.WriteLine($"{x.RoomID} \t\t{x.StartTime} \t{x.StaffID} \t\t{x.BookedInStudentID}");
+                    Console.WriteLine($"{x.RoomID} \t\t{x.StartTime.ToShortTimeString()} " +
+                    	              $"\t{x.StartTime.AddHours(1).ToShortTimeString()} \t{x.StaffID} \t\t{x.BookedInStudentID}");
                     noslot = false;
                 }
 
