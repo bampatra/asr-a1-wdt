@@ -89,17 +89,43 @@ namespace AppointmentSchedulingReservation
                     base.TimeValidation(timeInput) == true &&
                     base.StudentValidation(studentInput) == true)
                 {
-                    // If all inputs are valid, then add to database
-                    Console.WriteLine("Slot created successfully");
-                    repeat = false;
+                    // Convert date and time into one datetime object
+                    string[] dateParts = dateInput.Split('-');
+                    string[] timeParts = timeInput.Split(':');
+
+                    // create new date from the parts
+                    DateTime newDate = new
+                        DateTime(Convert.ToInt32(dateParts[2]),
+                        Convert.ToInt32(dateParts[1]),
+                        Convert.ToInt32(dateParts[0]),
+                        Convert.ToInt32(timeParts[0]),
+                        Convert.ToInt32(timeParts[1]),
+                        0);
+
+                    // If all inputs are valid, update database
+                    var item = StudentManager.GetSlot(roomInput, newDate);
+                    if (item == null)
+                    {
+                        Console.WriteLine("Slot does not exist");
+                        Console.WriteLine();
+                    }
+                    else
+                    {
+                        StudentManager.MakeBooking(item, studentInput);
+                        Console.WriteLine("Slot has been booked");
+                        repeat = false;
+                    }
+
+
+
                 }
                 else
                 {
                     Console.WriteLine("Invalid input, please re-type data");
                 }
             }
-
         }
+
 
         public void CancelBooking()
         {

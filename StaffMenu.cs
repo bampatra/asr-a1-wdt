@@ -91,6 +91,7 @@ namespace AppointmentSchedulingReservation
                     base.StaffValidation(staffInput) == true)
                 {
                     // If all inputs are valid, then add to database
+                    StaffManager.CreateSlot(roomInput, dateInput, timeInput, staffInput);
                     Console.WriteLine("Slot created successfully");
                     repeat = false;
                 }
@@ -98,7 +99,6 @@ namespace AppointmentSchedulingReservation
                 {
                     Console.WriteLine("Invalid input, please re-type data");
                 }
-
 
 
             }
@@ -124,8 +124,12 @@ namespace AppointmentSchedulingReservation
                     base.TimeValidation(timeInput) == true)
                 {
                     // Checks if slot exists, then remove from database
-                    Console.WriteLine("Slot removed successfully");
-                    repeat = false;
+                    if (StaffManager.RemoveSlot(roomInput, dateInput, timeInput) == true)
+                    {
+                        Console.WriteLine("Slot removed successfully");
+                        repeat = false;
+                    }
+
                 }
                 else
                 {
