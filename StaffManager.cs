@@ -59,16 +59,24 @@ namespace AppointmentSchedulingReservation
                 if(CheckMaxSlot(Date, StaffID, RoomName) == true)
                 {
                     // Add to database
-                    var command = connection.CreateCommand();
+                    try
+                    {
+                        var command = connection.CreateCommand();
 
-                    command.CommandText = $"insert into Slot (RoomID, StartTime, StaffID, BookedInStudentID) " +
-                        "values(@roomID, @starttime, @staffID, null)";
-                    command.Parameters.AddWithValue("roomID", RoomName);
-                    command.Parameters.AddWithValue("starttime", newDate);
-                    command.Parameters.AddWithValue("staffID", StaffID);
+                        command.CommandText = $"insert into Slot (RoomID, StartTime, StaffID, BookedInStudentID) " +
+                            "values(@roomID, @starttime, @staffID, null)";
+                        command.Parameters.AddWithValue("roomID", RoomName);
+                        command.Parameters.AddWithValue("starttime", newDate);
+                        command.Parameters.AddWithValue("staffID", StaffID);
 
-                    command.ExecuteNonQuery();
-                    Console.WriteLine("Slot created successfully");
+                        command.ExecuteNonQuery();
+                        Console.WriteLine("Slot created successfully");
+                    }
+                    catch (System.Data.SqlClient.SqlException)
+                    {
+                        Console.WriteLine("Room name or Staff ID does not exist in database.");
+                    }
+
                 }
                 else
                 {

@@ -42,16 +42,24 @@ namespace AppointmentSchedulingReservation
                 {
                     connection.Open();
 
-                    var command = connection.CreateCommand();
-                    command.CommandText =
-                        "update Slot set BookedInStudentId = @studentID where " +
-                        "RoomID = @roomID and StartTime = @starttime";
-                    command.Parameters.AddWithValue("studentID", StudentID);
-                    command.Parameters.AddWithValue("roomID", slot.RoomID);
-                    command.Parameters.AddWithValue("starttime", slot.StartTime);
+                    try
+                    {
+                        var command = connection.CreateCommand();
+                        command.CommandText =
+                            "update Slot set BookedInStudentId = @studentID where " +
+                            "RoomID = @roomID and StartTime = @starttime";
+                        command.Parameters.AddWithValue("studentID", StudentID);
+                        command.Parameters.AddWithValue("roomID", slot.RoomID);
+                        command.Parameters.AddWithValue("starttime", slot.StartTime);
 
-                    command.ExecuteNonQuery();
-                    Console.WriteLine("Slot has been booked");
+                        command.ExecuteNonQuery();
+                        Console.WriteLine("Slot has been booked");
+                    }
+
+                    catch (System.Data.SqlClient.SqlException)
+                    {
+                        Console.WriteLine("Room name or Staff ID does not exist in database.");
+                    }
                 }
                 else
                 {
@@ -65,16 +73,26 @@ namespace AppointmentSchedulingReservation
         {
             using (var connection = Program.ConnectionString.CreateConnection())
             {
-                connection.Open();
 
-                var command = connection.CreateCommand();
-                command.CommandText =
-                    "update Slot set BookedInStudentId = null where " +
-                    "RoomID = @roomID and StartTime = @starttime";
-                command.Parameters.AddWithValue("roomID", slot.RoomID);
-                command.Parameters.AddWithValue("starttime", slot.StartTime);
+                if (slot.BookedInStudentID is DBNull)
+                {
+                    Console.WriteLine("No booking is found for this slot");
+                }
+                else
+                {
+                    connection.Open();
 
-                command.ExecuteNonQuery();
+                    var command = connection.CreateCommand();
+                    command.CommandText =
+                        "update Slot set BookedInStudentId = null where " +
+                        "RoomID = @roomID and StartTime = @starttime";
+                    command.Parameters.AddWithValue("roomID", slot.RoomID);
+                    command.Parameters.AddWithValue("starttime", slot.StartTime);
+
+                    command.ExecuteNonQuery();
+                    Console.WriteLine("Booking has been cancelled");
+                }
+
             }
         }
 

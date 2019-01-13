@@ -61,7 +61,6 @@ namespace AppointmentSchedulingReservation
             Match match = Regex.Match(studentID, staffRegex);
             if (match.Success)
             {
-                Console.WriteLine("Student ID is valid");
                 return true;
             }
             else
@@ -79,7 +78,6 @@ namespace AppointmentSchedulingReservation
             Match match = Regex.Match(staffID, staffRegex);
             if (match.Success)
             {
-                Console.WriteLine("Staff ID is valid");
                 return true;
             }
             else

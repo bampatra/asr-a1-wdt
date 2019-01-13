@@ -49,27 +49,24 @@ namespace AppointmentSchedulingReservation
 
         public void RoomAvailability()
         {
-            bool repeat = true;
 
-            while (repeat == true)
+            Console.Write("Enter date for room availability (dd-mm-yyyy): ");
+            string dateInput = Console.ReadLine();
+
+            if (base.DateValidation(dateInput) == true)
             {
-                Console.Write("Enter date for room availability (dd-mm-yyyy): ");
-                string dateInput = Console.ReadLine();
+                // show availabilites
+                Console.WriteLine();
+                Console.WriteLine($"Rooms available on {dateInput}");
+                Console.WriteLine("Room name ");
+                StaffManager.DisplayAvailableRoom(dateInput);
 
-                if (base.DateValidation(dateInput) == true)
-                {
-                    // show availabilites
-                    Console.WriteLine();
-                    Console.WriteLine($"Rooms available on {dateInput}");
-                    Console.WriteLine("Room name ");
-                    StaffManager.DisplayAvailableRoom(dateInput);
-                    repeat = false;
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input, please re-type data");
-                }
             }
+            else
+            {
+                Console.WriteLine("Invalid input, please re-type data");
+            }
+            
         }
 
         public void CreateSlot()
@@ -109,37 +106,31 @@ namespace AppointmentSchedulingReservation
 
         public void RemoveSlot()
         {
-            bool repeat = true;
+  
+            Console.WriteLine("--- Remove slot ---");
+            Console.Write("Enter room name: ");
+            string roomInput = Console.ReadLine();
+            Console.Write("Enter date for slot (dd-mm-yyyy): ");
+            string dateInput = Console.ReadLine();
+            Console.Write("Enter time for slot (hh:mm): ");
+            string timeInput = Console.ReadLine();
 
-            while (repeat == true)
+            // Validations
+            if (base.DateValidation(dateInput) == true &&
+                base.TimeValidation(timeInput) == true)
             {
-
-                Console.WriteLine("--- Remove slot ---");
-                Console.Write("Enter room name: ");
-                string roomInput = Console.ReadLine();
-                Console.Write("Enter date for slot (dd-mm-yyyy): ");
-                string dateInput = Console.ReadLine();
-                Console.Write("Enter time for slot (hh:mm): ");
-                string timeInput = Console.ReadLine();
-
-                // Validations
-                if (base.DateValidation(dateInput) == true &&
-                    base.TimeValidation(timeInput) == true)
+                // Checks if slot exists, then remove from database
+                if (StaffManager.RemoveSlot(roomInput, dateInput, timeInput) == true)
                 {
-                    // Checks if slot exists, then remove from database
-                    if (StaffManager.RemoveSlot(roomInput, dateInput, timeInput) == true)
-                    {
-                        Console.WriteLine("Slot removed successfully");
-                        repeat = false;
-                    }
-
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input, please re-type data");
+                    Console.WriteLine("Slot removed successfully");
                 }
 
             }
+            else
+            {
+                Console.WriteLine("Invalid input, please re-type data");
+            }
+
         }
 
 
