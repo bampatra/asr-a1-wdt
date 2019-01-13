@@ -26,7 +26,7 @@ namespace AppointmentSchedulingReservation
                 slotCommand.CommandText = "select * from Slot";
 
                 Rooms = roomCommand.GetDataTable().Select().Select(x => new Room((string)x["RoomID"])).ToList();
-                Staffs = staffCommand.GetDataTable().Select().Select(x => 
+                Staffs = staffCommand.GetDataTable().Select().Select(x =>
                     new User((string)x["UserID"], (string)x["Name"], (string)x["Email"])).ToList();
                 Slots = slotCommand.GetDataTable().Select().Select(x =>
                     new Slot((string)x["RoomID"], (DateTime)x["StartTime"], (string)x["StaffID"],
@@ -53,21 +53,29 @@ namespace AppointmentSchedulingReservation
                     Convert.ToInt32(timeParts[0]),
                     Convert.ToInt32(timeParts[1]),
                     0);
-
-                // Check if room and StaffID exists in database
+                    
 
                 // Check maximum booking
+                if(CheckMaxSlot(Date, StaffID, RoomName) == true)
+                {
+                    // Add to database
+                    var command = connection.CreateCommand();
 
-                // Add to database
-                var command = connection.CreateCommand();
+                    command.CommandText = $"insert into Slot (RoomID, StartTime, StaffID, BookedInStudentID) " +
+                        "values(@roomID, @starttime, @staffID, null)";
+                    command.Parameters.AddWithValue("roomID", RoomName);
+                    command.Parameters.AddWithValue("starttime", newDate);
+                    command.Parameters.AddWithValue("staffID", StaffID);
 
-                command.CommandText = $"insert into Slot (RoomID, StartTime, StaffID, BookedInStudentID) " +
-                    "values(@roomID, @starttime, @staffID, null)";
-                command.Parameters.AddWithValue("roomID", RoomName);
-                command.Parameters.AddWithValue("starttime", newDate);
-                command.Parameters.AddWithValue("staffID", StaffID);
+                    command.ExecuteNonQuery();
+                    Console.WriteLine("Slot created successfully");
+                }
+                else
+                {
+                    Console.WriteLine("Maximum limit has been reached. Unable to create slot.");
+                }
 
-                command.ExecuteNonQuery();
+
             }
         }
 
@@ -75,6 +83,7 @@ namespace AppointmentSchedulingReservation
         {
 
             bool match = false;
+            bool booked = true;
             // Convert date and time into one datetime object
             string[] dateParts = Date.Split('-');
             string[] timeParts = Time.Split(':');
@@ -100,29 +109,115 @@ namespace AppointmentSchedulingReservation
                 {
                     using (var connection = Program.ConnectionString.CreateConnection())
                     {
-                        connection.Open();
 
-                        var command = connection.CreateCommand();
+                        if (x.BookedInStudentID is DBNull)
+                        {
+                            connection.Open();
 
-                        command.CommandText = $"delete from Slot where RoomID = @roomID and " +
-                                                "StartTime = @starttime";
-                        command.Parameters.AddWithValue("roomID", RoomName);
-                        command.Parameters.AddWithValue("starttime", newDate);
+                            var command = connection.CreateCommand();
 
-                        command.ExecuteNonQuery();
-                        match = true;
-                        return true;
+                            command.CommandText = $"delete from Slot where RoomID = @roomID and " +
+                                                    "StartTime = @starttime";
+                            command.Parameters.AddWithValue("roomID", RoomName);
+                            command.Parameters.AddWithValue("starttime", newDate);
+
+                            command.ExecuteNonQuery();
+                            match = true;
+                            booked = false;
+                            return true;
+
+                        }
 
                     }
                 }
             }
 
-            if (match == false)
+            if (match == false || booked == true)
             {
-                Console.WriteLine("Slot is not found");
+                Console.WriteLine("Unable to remove slot");
             }
 
             return false;
+        }
+
+        public bool CheckMaxSlot(string date, string StaffID, string RoomID)
+        {
+
+            int countStaffBookings = 0;
+            int countRoomBookings = 0;
+            string[] dateParts = date.Split('-');
+
+            // create new date from the parts
+            DateTime FromDate = new
+                DateTime(Convert.ToInt32(dateParts[2]),
+                Convert.ToInt32(dateParts[1]),
+                Convert.ToInt32(dateParts[0]));
+
+            DateTime ToDate = new
+                DateTime(Convert.ToInt32(dateParts[2]),
+                Convert.ToInt32(dateParts[1]),
+                Convert.ToInt32(dateParts[0]),
+                23, 59, 59);
+
+
+            foreach (var x in Slots)
+            {
+                // Checks if the staff has not made more than 4 bookings in one day
+                if (FromDate <= x.StartTime && x.StartTime <= ToDate && x.StaffID == StaffID)
+                {
+                    countStaffBookings += 1;
+                }
+
+                // Checks if the room has not been booked more than 2 times in one day
+                if (FromDate <= x.StartTime && x.StartTime <= ToDate && x.RoomID == RoomID)
+                {
+                    countRoomBookings += 1;
+                }
+
+            }
+
+            if (countStaffBookings < 4 && countRoomBookings < 2)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        public void DisplayAvailableRoom(string dateInput)
+        {
+            string[] dateParts = dateInput.Split('-');
+            int RoomCount = 0;
+
+            // create new date from the parts
+            DateTime FromDate = new
+                DateTime(Convert.ToInt32(dateParts[2]),
+                Convert.ToInt32(dateParts[1]),
+                Convert.ToInt32(dateParts[0]));
+
+            DateTime ToDate = new
+                DateTime(Convert.ToInt32(dateParts[2]),
+                Convert.ToInt32(dateParts[1]),
+                Convert.ToInt32(dateParts[0]),
+                23, 59, 59);
+
+            foreach(var x in Rooms)
+            {
+                foreach(var y in Slots)
+                {
+                    if(FromDate <= y.StartTime && y.StartTime <= ToDate && x.RoomID == y.RoomID)
+                    {
+                        RoomCount += 1;
+                    }
+                }
+
+                if (RoomCount < 2) { Console.WriteLine( x.RoomID ); }
+                RoomCount = 0;
+
+            }
         }
 
     }

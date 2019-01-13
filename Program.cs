@@ -13,9 +13,9 @@ namespace AppointmentSchedulingReservation
 
         private static void Main(string[] args)
         {
-            StaffMenu staff = new StaffMenu();
-            StudentMenu student = new StudentMenu();
-            MainMenu mainmenu = new MainMenu();
+            var staff = new StaffMenu();
+            var student = new StudentMenu();
+            var mainmenu = new MainMenu();
             bool repeat = true;
 
             Console.WriteLine("--------------------------------------------------------");

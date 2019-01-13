@@ -59,6 +59,10 @@ namespace AppointmentSchedulingReservation
                 if (base.DateValidation(dateInput) == true)
                 {
                     // show availabilites
+                    Console.WriteLine();
+                    Console.WriteLine($"Rooms available on {dateInput}");
+                    Console.WriteLine("Room name ");
+                    StaffManager.DisplayAvailableRoom(dateInput);
                     repeat = false;
                 }
                 else
@@ -92,7 +96,6 @@ namespace AppointmentSchedulingReservation
                 {
                     // If all inputs are valid, then add to database
                     StaffManager.CreateSlot(roomInput, dateInput, timeInput, staffInput);
-                    Console.WriteLine("Slot created successfully");
                     repeat = false;
                 }
                 else

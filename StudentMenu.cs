@@ -116,7 +116,7 @@ namespace AppointmentSchedulingReservation
 
             while (repeat == true)
             {
-                Console.WriteLine("--- Create slot ---");
+                Console.WriteLine("--- Make booking ---");
                 Console.Write("Enter room name: ");
                 string roomInput = Console.ReadLine();
                 Console.Write("Enter date for slots (dd-mm-yyyy): ");
@@ -153,12 +153,17 @@ namespace AppointmentSchedulingReservation
                     }
                     else
                     {
-                        StudentManager.MakeBooking(item, studentInput);
-                        Console.WriteLine("Slot has been booked");
-                        repeat = false;
+                        if(StudentManager.CheckMaxBooking(dateInput, studentInput, roomInput) == true)
+                        {
+                            StudentManager.MakeBooking(item, studentInput);
+                            repeat = false;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Maximum limit has been reached. Unable to create slot.");
+                            repeat = false;
+                        }
                     }
-
-
 
                 }
                 else

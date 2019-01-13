@@ -37,17 +37,27 @@ namespace AppointmentSchedulingReservation
         {
             using (var connection = Program.ConnectionString.CreateConnection())
             {
-                connection.Open();
+                // Checks if the slot has not been booked
+                if(slot.BookedInStudentID is DBNull)
+                {
+                    connection.Open();
 
-                var command = connection.CreateCommand();
-                command.CommandText =
-                    "update Slot set BookedInStudentId = @studentID where " +
-                    "RoomID = @roomID and StartTime = @starttime";
-                command.Parameters.AddWithValue("studentID", StudentID);
-                command.Parameters.AddWithValue("roomID", slot.RoomID);
-                command.Parameters.AddWithValue("starttime", slot.StartTime);
+                    var command = connection.CreateCommand();
+                    command.CommandText =
+                        "update Slot set BookedInStudentId = @studentID where " +
+                        "RoomID = @roomID and StartTime = @starttime";
+                    command.Parameters.AddWithValue("studentID", StudentID);
+                    command.Parameters.AddWithValue("roomID", slot.RoomID);
+                    command.Parameters.AddWithValue("starttime", slot.StartTime);
 
-                command.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
+                    Console.WriteLine("Slot has been booked");
+                }
+                else
+                {
+                    Console.WriteLine("Slot is already booked. Please choose another slot.");
+                }
+
             }
         }
 
@@ -65,6 +75,45 @@ namespace AppointmentSchedulingReservation
                 command.Parameters.AddWithValue("starttime", slot.StartTime);
 
                 command.ExecuteNonQuery();
+            }
+        }
+
+        public bool CheckMaxBooking(string date, string StudentID, string RoomID)
+        {
+            int countStudentBookings = 0;
+            string[] dateParts = date.Split('-');
+
+            // create new date from the parts
+            DateTime FromDate = new
+                DateTime(Convert.ToInt32(dateParts[2]),
+                Convert.ToInt32(dateParts[1]),
+                Convert.ToInt32(dateParts[0]));
+
+            DateTime ToDate = new
+                DateTime(Convert.ToInt32(dateParts[2]),
+                Convert.ToInt32(dateParts[1]),
+                Convert.ToInt32(dateParts[0]),
+                23, 59, 59);
+
+            foreach (var x in Slots)
+            {
+                if (FromDate <= x.StartTime && x.StartTime <= ToDate)
+                {
+                    if (x.BookedInStudentID is string)
+                    {
+                        if (x.BookedInStudentID == StudentID) { countStudentBookings += 1; }
+                    } 
+
+                }
+            }
+
+            if (countStudentBookings < 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }
