@@ -6,7 +6,8 @@ namespace AppointmentSchedulingReservation
 {
     public class MainMenu
     {
-        private StaffManager StaffManager { get; } = new StaffManager();
+        private static StaffManager StaffManager { get; } = new StaffManager();
+
 
         public void ListRooms()
         {
@@ -57,14 +58,14 @@ namespace AppointmentSchedulingReservation
                         Convert.ToInt32(dateParts[0]),
                         23,59,59);
 
-                    if (StaffManager.Slots == null)
+                    if (StaffManager.UserManager.Slots == null)
                     {
                         Console.WriteLine("No such item.");
                         Console.WriteLine();
                         return;
                     }
 
-                    DisplaySlots(StaffManager.Slots, dateInput, FromDate, ToDate);
+                    DisplaySlots(StaffManager.UserManager.Slots, dateInput, FromDate, ToDate);
 
                     repeat = false;
 

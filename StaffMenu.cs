@@ -4,9 +4,10 @@ using System.Linq;
 
 namespace AppointmentSchedulingReservation
 {
-    public class StaffMenu : AppointmentSchedulingReservation.UserAbstract, AppointmentSchedulingReservation.IStaff
+    public class StaffMenu : UserAbstract, IStaff
     {
-        private StaffManager StaffManager { get; } = new StaffManager();
+        // Different Slot
+        private static StaffManager StaffManager { get; } = new StaffManager();
 
 
         public void MenuOption()

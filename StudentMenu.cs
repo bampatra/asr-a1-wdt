@@ -4,9 +4,11 @@ using System.Linq;
 
 namespace AppointmentSchedulingReservation
 {
-    public class StudentMenu : AppointmentSchedulingReservation.UserAbstract, AppointmentSchedulingReservation.IStudent
+    public class StudentMenu : UserAbstract, IStudent
     {
         private StudentManager StudentManager { get; } = new StudentManager();
+
+
 
         public void MenuOption()
         {
@@ -96,7 +98,7 @@ namespace AppointmentSchedulingReservation
             foreach (var x in slots)
             {
                 if (FromDate <= x.StartTime && x.StartTime <= ToDate && 
-                    x.StaffID == staffID && x.BookedInStudentID is DBNull)
+                    x.StaffID == staffID && x.BookedInStudentID is DBNull || x.BookedInStudentID is null)
                 {
                     Console.WriteLine($"{x.RoomID} \t\t{x.StartTime.ToShortTimeString()} " +
                     	               $"\t{x.StartTime.AddHours(1).ToShortTimeString()}");

@@ -31,16 +31,17 @@ namespace AppointmentSchedulingReservation
 
         protected bool TimeValidation(string time)
         {
-            var dateTime = DateTime.ParseExact(time, "H:mm", null, System.Globalization.DateTimeStyles.None);
+            try
+            {
+                var dateTime = DateTime.ParseExact(time, "H:mm", null, System.Globalization.DateTimeStyles.None);
 
-            if (dateTime.Minute != 0)
-            {
-                Console.WriteLine("Invalid time format");
-                return false;
-            }
-            else
-            {
-                if (9 <= dateTime.Hour && dateTime.Hour <= 13)
+                if (dateTime.Minute != 0)
+                {
+                    Console.WriteLine("Invalid time format");
+                    return false;
+                }
+                else
+                    if (9 <= dateTime.Hour && dateTime.Hour <= 13)
                 {
                     //Console.WriteLine(dateTime);
                     return true;
@@ -50,8 +51,14 @@ namespace AppointmentSchedulingReservation
                     Console.WriteLine("Outside working hour");
                     return false;
                 }
-
             }
+
+            catch (System.FormatException)
+            {
+                return false;
+            }
+
+
         }
 
         protected bool StudentValidation(string studentID)
