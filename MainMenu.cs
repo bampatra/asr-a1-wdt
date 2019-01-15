@@ -6,21 +6,34 @@ namespace AppointmentSchedulingReservation
 {
     public class MainMenu
     {
-        private static StaffManager StaffManager { get; } = new StaffManager();
+        //private static StaffManager StaffManager { get; } = new StaffManager();
+        private static MainMenu instance = null;
 
+        public static MainMenu Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new MainMenu();
+                }
+                return instance;
+            }
+
+        }
 
         public void ListRooms()
         {
 
             Console.WriteLine("--- List rooms ---");
-            if (!StaffManager.Rooms.Any())
+            if (!StaffManager.Instance.Rooms.Any())
             {
                 Console.WriteLine("No items present.");
                 Console.WriteLine();
                 return;
             }
 
-            DisplayRooms(StaffManager.Rooms);
+            DisplayRooms(StaffManager.Instance.Rooms);
 
         }
 
@@ -58,14 +71,14 @@ namespace AppointmentSchedulingReservation
                         Convert.ToInt32(dateParts[0]),
                         23,59,59);
 
-                    if (StaffManager.UserManager.Slots == null)
+                    if (UserManager.Instance.Slots == null)
                     {
                         Console.WriteLine("No such item.");
                         Console.WriteLine();
                         return;
                     }
 
-                    DisplaySlots(StaffManager.UserManager.Slots, dateInput, FromDate, ToDate);
+                    DisplaySlots(UserManager.Instance.Slots, dateInput, FromDate, ToDate);
 
                     repeat = false;
 

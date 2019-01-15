@@ -6,6 +6,7 @@ namespace AppointmentSchedulingReservation
 {
     public class UserManager
     {
+        private static UserManager instance = null;
         public List<Slot> Slots { get; set; }
 
         public UserManager()
@@ -19,6 +20,19 @@ namespace AppointmentSchedulingReservation
                              (dynamic)x["BookedInStudentID"])).ToList();
 
             }
+        }
+
+        public static UserManager Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new UserManager();
+                }
+                return instance;
+            }
+
         }
     }
 }

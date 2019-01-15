@@ -6,9 +6,21 @@ namespace AppointmentSchedulingReservation
 {
     public class StudentMenu : UserAbstract, IStudent
     {
-        private StudentManager StudentManager { get; } = new StudentManager();
+        //private StudentManager StudentManager { get; } = new StudentManager();
+        private static StudentMenu instance = null;
 
+        public static StudentMenu Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new StudentMenu();
+                }
+                return instance;
+            }
 
+        }
 
         public void MenuOption()
         {
@@ -26,24 +38,24 @@ namespace AppointmentSchedulingReservation
         public void ListStudents()
         {
             Console.WriteLine("--- List students ---");
-            if (!StudentManager.Students.Any())
+            if (!StudentManager.Instance.Students.Any())
             {
                 Console.WriteLine("No items present.");
                 Console.WriteLine();
                 return;
             }
 
-            DisplayStudents(StudentManager.Students);
+            DisplayStudents(StudentManager.Instance.Students);
 
         }
 
         private void DisplayStudents(IEnumerable<User> students)
         {
             //const string format = "{0,-5}{1,-25}{2}";
-            Console.WriteLine("ID \t\tName \tEmail");
+            Console.WriteLine("ID \t\tName \t\tEmail");
             foreach (var x in students)
             {
-                Console.WriteLine($"{x.UserID} \t{x.Name} \t{x.Email}");
+                Console.WriteLine($"{x.UserID} \t{x.Name} \t\t{x.Email}");
             }
             Console.WriteLine();
         }
@@ -63,7 +75,7 @@ namespace AppointmentSchedulingReservation
                 if (base.DateValidation(dateInput) == true &&
                     base.StaffValidation(staffInput) == true)
                 {
-                    DisplayStaffAvailability(StudentManager.Slots, dateInput, staffInput);
+                    DisplayStaffAvailability(StudentManager.Instance.Slots, dateInput, staffInput);
 
                     repeat = false;
                 }
@@ -98,7 +110,7 @@ namespace AppointmentSchedulingReservation
             foreach (var x in slots)
             {
                 if (FromDate <= x.StartTime && x.StartTime <= ToDate && 
-                    x.StaffID == staffID && x.BookedInStudentID is DBNull || x.BookedInStudentID is null)
+                    x.StaffID == staffID && (x.BookedInStudentID is DBNull || x.BookedInStudentID is null))
                 {
                     Console.WriteLine($"{x.RoomID} \t\t{x.StartTime.ToShortTimeString()} " +
                     	               $"\t{x.StartTime.AddHours(1).ToShortTimeString()}");
@@ -144,7 +156,7 @@ namespace AppointmentSchedulingReservation
                     0);
 
                 // If all inputs are valid, update database
-                var item = StudentManager.GetSlot(roomInput, newDate);
+                var item = StudentManager.Instance.GetSlot(roomInput, newDate);
                 if (item == null)
                 {
                     Console.WriteLine("Slot does not exist");
@@ -152,9 +164,9 @@ namespace AppointmentSchedulingReservation
                 }
                 else
                 {
-                    if(StudentManager.CheckMaxBooking(dateInput, studentInput, roomInput) == true)
+                    if(StudentManager.Instance.CheckMaxBooking(dateInput, studentInput, roomInput) == true)
                     {
-                        StudentManager.MakeBooking(item, studentInput);
+                        StudentManager.Instance.MakeBooking(item, studentInput);
                     }
                     else
                     {
@@ -173,54 +185,46 @@ namespace AppointmentSchedulingReservation
 
         public void CancelBooking()
         {
-            bool repeat = true;
+            Console.WriteLine("--- Cancel booking ---");
+            Console.Write("Enter room name: ");
+            string roomInput = Console.ReadLine();
+            Console.Write("Enter date for slot (dd-mm-yyyy): ");
+            string dateInput = Console.ReadLine();
+            Console.Write("Enter time for slot (hh:mm): ");
+            string timeInput = Console.ReadLine();
 
-            while (repeat == true)
+            // Validations
+            if (base.DateValidation(dateInput) == true &&
+                base.TimeValidation(timeInput) == true)
             {
-                Console.WriteLine("--- Cancel booking ---");
-                Console.Write("Enter room name: ");
-                string roomInput = Console.ReadLine();
-                Console.Write("Enter date for slot (dd-mm-yyyy): ");
-                string dateInput = Console.ReadLine();
-                Console.Write("Enter time for slot (hh:mm): ");
-                string timeInput = Console.ReadLine();
+                // Convert date and time into one datetime object
+                string[] dateParts = dateInput.Split('-');
+                string[] timeParts = timeInput.Split(':');
 
-                // Validations
-                if (base.DateValidation(dateInput) == true &&
-                    base.TimeValidation(timeInput) == true)
+                // create new date from the parts
+                DateTime newDate = new
+                    DateTime(Convert.ToInt32(dateParts[2]),
+                    Convert.ToInt32(dateParts[1]),
+                    Convert.ToInt32(dateParts[0]),
+                    Convert.ToInt32(timeParts[0]),
+                    Convert.ToInt32(timeParts[1]),
+                    0);
+
+                // If all inputs are valid, update database
+                var item = StudentManager.Instance.GetSlot(roomInput, newDate);
+                if (item == null)
                 {
-                    // Convert date and time into one datetime object
-                    string[] dateParts = dateInput.Split('-');
-                    string[] timeParts = timeInput.Split(':');
-
-                    // create new date from the parts
-                    DateTime newDate = new
-                        DateTime(Convert.ToInt32(dateParts[2]),
-                        Convert.ToInt32(dateParts[1]),
-                        Convert.ToInt32(dateParts[0]),
-                        Convert.ToInt32(timeParts[0]),
-                        Convert.ToInt32(timeParts[1]),
-                        0);
-
-                    // If all inputs are valid, update database
-                    var item = StudentManager.GetSlot(roomInput, newDate);
-                    if (item == null)
-                    {
-                        Console.WriteLine("Slot does not exist");
-                        Console.WriteLine();
-                    }
-                    else
-                    {
-                        StudentManager.CancelBooking(item);
-
-                        repeat = false;
-                    }
+                    Console.WriteLine("Slot does not exist");
+                    Console.WriteLine();
                 }
                 else
                 {
-                    Console.WriteLine("Invalid input, please re-type data");
+                    StudentManager.Instance.CancelBooking(item);
                 }
-
+            }
+            else
+            {
+                Console.WriteLine("Invalid input, please re-type data");
             }
 
         }

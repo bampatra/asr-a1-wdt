@@ -6,36 +6,45 @@ namespace AppointmentSchedulingReservation
 {
     public class StaffManager
     {
+        private static StaffManager instance = null;
+
         public List<Room> Rooms { get; }
         public List<User> Staffs { get; }
 
-        public static UserManager UserManager { get; } = new UserManager();
+        //public static UserManager UserManager { get; } = new UserManager();
 
-        // Constructor might be singleton
         public StaffManager()
         {
             using (var connection = Program.ConnectionString.CreateConnection())
             {
                 var roomCommand = connection.CreateCommand();
                 var staffCommand = connection.CreateCommand();
-                //var slotCommand = connection.CreateCommand();
 
 
                 roomCommand.CommandText = "select * from Room";
-                // select all from user where email ends with rmit.edu.au
+
+                // select all from user whose email ends with rmit.edu.au
                 staffCommand.CommandText = "select * from [User] where Email like '%_@rmit%.edu%.au%'";
-                //slotCommand.CommandText = "select * from Slot";
+
 
                 Rooms = roomCommand.GetDataTable().Select().Select(x => new Room((string)x["RoomID"])).ToList();
                 Staffs = staffCommand.GetDataTable().Select().Select(x =>
                     new User((string)x["UserID"], (string)x["Name"], (string)x["Email"])).ToList();
-                //Slots = slotCommand.GetDataTable().Select().Select(x =>
-                //new Slot((string)x["RoomID"], (DateTime)x["StartTime"], (string)x["StaffID"],
-                //(dynamic)x["BookedInStudentID"])).ToList();
-
-                
-
+                    
             }
+        }
+
+        public static StaffManager Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new StaffManager();
+                }
+                return instance;
+            }
+
         }
 
         public void CreateSlot(string RoomName, string Date, string Time, string StaffID)
@@ -73,7 +82,7 @@ namespace AppointmentSchedulingReservation
                         command.Parameters.AddWithValue("staffID", StaffID);
                         command.ExecuteNonQuery();
 
-                        UserManager.Slots.Add(new Slot(RoomName, newDate, StaffID, null));
+                        UserManager.Instance.Slots.Add(new Slot(RoomName, newDate, StaffID, null));
                         Console.WriteLine("Slot created successfully");
                     }
                     catch (System.Data.SqlClient.SqlException)
@@ -110,13 +119,13 @@ namespace AppointmentSchedulingReservation
                 Convert.ToInt32(timeParts[1]),
                 0);
 
-            if (!UserManager.Slots.Any())
+            if (!UserManager.Instance.Slots.Any())
             {
                 Console.WriteLine("There is no slot in database");
                 return false;
             }
 
-            foreach (var x in UserManager.Slots)
+            foreach (var x in UserManager.Instance.Slots)
             {
                 if (x.RoomID == RoomName && x.StartTime == newDate)
                 {
@@ -135,7 +144,7 @@ namespace AppointmentSchedulingReservation
                             command.Parameters.AddWithValue("starttime", newDate);
                             command.ExecuteNonQuery();
 
-                            UserManager.Slots.RemoveAt(index);
+                            UserManager.Instance.Slots.RemoveAt(index);
                             match = true;
                             booked = false;
                             return true;
@@ -175,7 +184,7 @@ namespace AppointmentSchedulingReservation
                 23, 59, 59);
 
 
-            foreach (var x in UserManager.Slots)
+            foreach (var x in UserManager.Instance.Slots)
             {
                 // Checks if the staff has not made more than 4 bookings in one day
                 if (FromDate <= x.StartTime && x.StartTime <= ToDate && x.StaffID == StaffID)
@@ -221,7 +230,7 @@ namespace AppointmentSchedulingReservation
 
             foreach(var x in Rooms)
             {
-                foreach(var y in UserManager.Slots)
+                foreach(var y in UserManager.Instance.Slots)
                 {
                     if(FromDate <= y.StartTime && y.StartTime <= ToDate && x.RoomID == y.RoomID)
                     {

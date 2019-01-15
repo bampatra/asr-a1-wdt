@@ -6,8 +6,22 @@ namespace AppointmentSchedulingReservation
 {
     public class StaffMenu : UserAbstract, IStaff
     {
-        // Different Slot
-        private static StaffManager StaffManager { get; } = new StaffManager();
+
+        //private static StaffManager StaffManager { get; } = new StaffManager();
+        private static StaffMenu instance = null;
+
+        public static StaffMenu Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new StaffMenu();
+                }
+                return instance;
+            }
+
+        }
 
 
         public void MenuOption()
@@ -26,14 +40,14 @@ namespace AppointmentSchedulingReservation
         public void ListStaff()
         {
             Console.WriteLine("--- List staff ---");
-            if (!StaffManager.Staffs.Any())
+            if (!StaffManager.Instance.Staffs.Any())
             {
                 Console.WriteLine("No items present.");
                 Console.WriteLine();
                 return;
             }
 
-            DisplayStaff(StaffManager.Staffs);
+            DisplayStaff(StaffManager.Instance.Staffs);
 
         }
 
@@ -60,7 +74,7 @@ namespace AppointmentSchedulingReservation
                 Console.WriteLine();
                 Console.WriteLine($"Rooms available on {dateInput}");
                 Console.WriteLine("Room name ");
-                StaffManager.DisplayAvailableRoom(dateInput);
+                StaffManager.Instance.DisplayAvailableRoom(dateInput);
 
             }
             else
@@ -72,37 +86,31 @@ namespace AppointmentSchedulingReservation
 
         public void CreateSlot()
         {
-            bool repeat = true;
+           
+            Console.WriteLine("--- Create slot ---");
+            Console.Write("Enter room name: ");
+            string roomInput = Console.ReadLine();
+            Console.Write("Enter date for slot (dd-mm-yyyy): ");
+            string dateInput = Console.ReadLine();
+            Console.Write("Enter time for slot (hh:mm): ");
+            string timeInput = Console.ReadLine();
+            Console.Write("Enter staff ID: ");
+            string staffInput = Console.ReadLine();
 
-            while (repeat == true)
+            // Validations
+
+            if (base.DateValidation(dateInput) == true && 
+                base.TimeValidation(timeInput) == true &&
+                base.StaffValidation(staffInput) == true)
             {
-                Console.WriteLine("--- Create slot ---");
-                Console.Write("Enter room name: ");
-                string roomInput = Console.ReadLine();
-                Console.Write("Enter date for slot (dd-mm-yyyy): ");
-                string dateInput = Console.ReadLine();
-                Console.Write("Enter time for slot (hh:mm): ");
-                string timeInput = Console.ReadLine();
-                Console.Write("Enter staff ID: ");
-                string staffInput = Console.ReadLine();
-
-                // Validations
-
-                if (base.DateValidation(dateInput) == true && 
-                    base.TimeValidation(timeInput) == true &&
-                    base.StaffValidation(staffInput) == true)
-                {
-                    // If all inputs are valid, then add to database
-                    StaffManager.CreateSlot(roomInput, dateInput, timeInput, staffInput);
-                    repeat = false;
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input, please re-type data");
-                }
-
-
+                // If all inputs are valid, then add to database
+                StaffManager.Instance.CreateSlot(roomInput, dateInput, timeInput, staffInput);
             }
+            else
+            {
+                Console.WriteLine("Invalid input, please re-type data");
+            }
+
         }
 
         public void RemoveSlot()
@@ -121,7 +129,7 @@ namespace AppointmentSchedulingReservation
                 base.TimeValidation(timeInput) == true)
             {
                 // Checks if slot exists, then remove from database
-                if (StaffManager.RemoveSlot(roomInput, dateInput, timeInput) == true)
+                if (StaffManager.Instance.RemoveSlot(roomInput, dateInput, timeInput) == true)
                 {
                     Console.WriteLine("Slot removed successfully");
                 }

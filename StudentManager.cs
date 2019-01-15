@@ -6,10 +6,12 @@ namespace AppointmentSchedulingReservation
 {
     public class StudentManager
     {
+        private static StudentManager instance = null;
+
         public List<User> Students { get; }
         public List<Slot> Slots { get;  }
 
-        private static StaffManager StaffManager { get; } = new StaffManager();
+        //private static StaffManager StaffManager { get; } = new StaffManager();
 
         public StudentManager()
         {
@@ -29,10 +31,27 @@ namespace AppointmentSchedulingReservation
                 //new Slot((string)x["RoomID"], (DateTime)x["StartTime"], (string)x["StaffID"],
                 //(dynamic)x["BookedInStudentID"])).ToList();
 
-                Slots = StaffManager.UserManager.Slots;
+                //Slots = StaffManager.UserManager.Slots;
+
+                Slots = UserManager.Instance.Slots;
             }
 
         }
+
+        public static StudentManager Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new StudentManager();
+                }
+                return instance;
+            }
+
+        }
+
+
 
         public Slot GetSlot(string roomName, DateTime date) => Slots.FirstOrDefault(x => 
         x.RoomID.Equals(roomName) && x.StartTime == date);

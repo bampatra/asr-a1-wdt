@@ -6,40 +6,36 @@ namespace AppointmentSchedulingReservation
     public static class Program
     {
 
+        /* The following configuration code was referenced from tutelab materials */
         private static IConfigurationRoot Configuration { get; } =
             new ConfigurationBuilder().AddJsonFile("dbsetting.json").Build();
-
         public static string ConnectionString { get; } = Configuration["ConnectionString"];
 
         private static void Main(string[] args)
         {
-            var staff = new StaffMenu();
-            var student = new StudentMenu();
-            var mainmenu = new MainMenu();
-            bool repeat = true;
 
             Console.WriteLine("--------------------------------------------------------");
             Console.WriteLine("Welcome to Appointment Scheduling and Reservation System");
             Console.WriteLine("--------------------------------------------------------");
             Console.WriteLine("");
 
-            while (repeat == true)
+            while (true)
             {
                 MenuOption();
                 string input = Console.ReadLine();
                 switch (input)
                 {
                     case "1":
-                        mainmenu.ListRooms();
+                        MainMenu.Instance.ListRooms();
                         break;
                     case "2":
-                        mainmenu.ListSlots();
+                        MainMenu.Instance.ListSlots();
                         break;
                     case "3":
-                        staff.ShowStaffMenu();
+                        StaffMenu.Instance.ShowStaffMenu();
                         break;
                     case "4":
-                        student.ShowStudentMenu();
+                        StudentMenu.Instance.ShowStudentMenu();
                         break;
                     case "5":
                         Console.WriteLine("Terminating ASR");
