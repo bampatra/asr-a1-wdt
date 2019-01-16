@@ -6,10 +6,9 @@ namespace AppointmentSchedulingReservation
 {
     public class StaffMenu : UserAbstract, IStaff
     {
-
-        //private static StaffManager StaffManager { get; } = new StaffManager();
         private static StaffMenu instance = null;
 
+        // Get the instance of the object
         public static StaffMenu Instance
         {
             get
@@ -23,7 +22,6 @@ namespace AppointmentSchedulingReservation
 
         }
 
-
         public void MenuOption()
         {
             Console.WriteLine("--------------------------------------------------------");
@@ -36,7 +34,7 @@ namespace AppointmentSchedulingReservation
             Console.Write("Enter option: ");
         }
 
-  
+        // Get the list of staff
         public void ListStaff()
         {
             Console.WriteLine("--- List staff ---");
@@ -51,9 +49,9 @@ namespace AppointmentSchedulingReservation
 
         }
 
+        // Print all staffs to the console
         private void DisplayStaff(IEnumerable<User> staffs)
         {
-            //const string format = "{0,-5}{1,-25}{2}";
             Console.WriteLine("ID \t\tName \t\tEmail");
             foreach (var x in staffs)
             {
@@ -62,15 +60,17 @@ namespace AppointmentSchedulingReservation
             Console.WriteLine();
         }
 
+        // Get the list of available rooms on the specified date
         public void RoomAvailability()
         {
 
             Console.Write("Enter date for room availability (dd-mm-yyyy): ");
             string dateInput = Console.ReadLine();
 
+            // Validate user input
             if (base.DateValidation(dateInput) == true)
             {
-                // show availabilites
+                // If all inputs are valid, show availabilites
                 Console.WriteLine();
                 Console.WriteLine($"Rooms available on {dateInput}");
                 Console.WriteLine("Room name ");
@@ -84,6 +84,7 @@ namespace AppointmentSchedulingReservation
             
         }
 
+        // Create a new slot
         public void CreateSlot()
         {
            
@@ -97,13 +98,12 @@ namespace AppointmentSchedulingReservation
             Console.Write("Enter staff ID: ");
             string staffInput = Console.ReadLine();
 
-            // Validations
-
+            // Validate user input
             if (base.DateValidation(dateInput) == true && 
                 base.TimeValidation(timeInput) == true &&
                 base.StaffValidation(staffInput) == true)
             {
-                // If all inputs are valid, then add to database
+                // If all inputs are valid, add to database and local memory
                 StaffManager.Instance.CreateSlot(roomInput, dateInput, timeInput, staffInput);
             }
             else
@@ -113,6 +113,7 @@ namespace AppointmentSchedulingReservation
 
         }
 
+        // Remove an existing slot
         public void RemoveSlot()
         {
   
@@ -124,11 +125,11 @@ namespace AppointmentSchedulingReservation
             Console.Write("Enter time for slot (hh:mm): ");
             string timeInput = Console.ReadLine();
 
-            // Validations
+            // Validate user input
             if (base.DateValidation(dateInput) == true &&
                 base.TimeValidation(timeInput) == true)
             {
-                // Checks if slot exists, then remove from database
+                // Checks if slot exists, remove from database and local memory
                 if (StaffManager.Instance.RemoveSlot(roomInput, dateInput, timeInput) == true)
                 {
                     Console.WriteLine("Slot removed successfully");

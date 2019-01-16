@@ -11,7 +11,6 @@ namespace AppointmentSchedulingReservation
         public List<Room> Rooms { get; }
         public List<User> Staffs { get; }
 
-        //public static UserManager UserManager { get; } = new UserManager();
 
         public StaffManager()
         {
@@ -23,10 +22,10 @@ namespace AppointmentSchedulingReservation
 
                 roomCommand.CommandText = "select * from Room";
 
-                // select all from user whose email ends with rmit.edu.au
+                // Get all users whose email ends with rmit.edu.au
                 staffCommand.CommandText = "select * from [User] where Email like '%_@rmit%.edu%.au%'";
 
-
+                // Create new objects from data gathered and add them to generic List<T>
                 Rooms = roomCommand.GetDataTable().Select().Select(x => new Room((string)x["RoomID"])).ToList();
                 Staffs = staffCommand.GetDataTable().Select().Select(x =>
                     new User((string)x["UserID"], (string)x["Name"], (string)x["Email"])).ToList();
@@ -34,6 +33,7 @@ namespace AppointmentSchedulingReservation
             }
         }
 
+        // Get the instance of the object
         public static StaffManager Instance
         {
             get
@@ -47,6 +47,7 @@ namespace AppointmentSchedulingReservation
 
         }
 
+        // Create a new slot 
         public void CreateSlot(string RoomName, string Date, string Time, string StaffID)
         {
             using (var connection = Program.ConnectionString.CreateConnection())
@@ -56,8 +57,6 @@ namespace AppointmentSchedulingReservation
                 // Convert date and time into one datetime object
                 string[] dateParts = Date.Split('-');
                 string[] timeParts = Time.Split(':');
-
-                // create new date from the parts
                 DateTime newDate = new
                     DateTime(Convert.ToInt32(dateParts[2]),
                     Convert.ToInt32(dateParts[1]),
@@ -70,11 +69,10 @@ namespace AppointmentSchedulingReservation
                 // Check maximum booking
                 if(CheckMaxSlot(Date, StaffID, RoomName) == true)
                 {
-                    // Add to database
                     try
                     {
+                        // Add new slot to database
                         var command = connection.CreateCommand();
-
                         command.CommandText = $"insert into Slot (RoomID, StartTime, StaffID, BookedInStudentID) " +
                             "values(@roomID, @starttime, @staffID, null)";
                         command.Parameters.AddWithValue("roomID", RoomName);
@@ -82,7 +80,9 @@ namespace AppointmentSchedulingReservation
                         command.Parameters.AddWithValue("staffID", StaffID);
                         command.ExecuteNonQuery();
 
+                        // Add new slot to local memory
                         UserManager.Instance.Slots.Add(new Slot(RoomName, newDate, StaffID, null));
+
                         Console.WriteLine("Slot created successfully");
                     }
                     catch (System.Data.SqlClient.SqlException)
@@ -100,17 +100,17 @@ namespace AppointmentSchedulingReservation
             }
         }
 
+        // Remove an existing slot
         public bool RemoveSlot(string RoomName, string Date, string Time)
         {
 
             bool match = false;
             bool booked = true;
             int index = 0;
+
             // Convert date and time into one datetime object
             string[] dateParts = Date.Split('-');
             string[] timeParts = Time.Split(':');
-
-            // create new date from the parts
             DateTime newDate = new
                 DateTime(Convert.ToInt32(dateParts[2]),
                 Convert.ToInt32(dateParts[1]),
@@ -131,19 +131,19 @@ namespace AppointmentSchedulingReservation
                 {
                     using (var connection = Program.ConnectionString.CreateConnection())
                     {
-
+                        // If the slot is not booked
                         if (x.BookedInStudentID is DBNull || x.BookedInStudentID is null)
                         {
+                            // Remove slot from database
                             connection.Open();
-
                             var command = connection.CreateCommand();
-
                             command.CommandText = $"delete from Slot where RoomID = @roomID and " +
                                                     "StartTime = @starttime";
                             command.Parameters.AddWithValue("roomID", RoomName);
                             command.Parameters.AddWithValue("starttime", newDate);
                             command.ExecuteNonQuery();
 
+                            // Remove slot from local memory
                             UserManager.Instance.Slots.RemoveAt(index);
                             match = true;
                             booked = false;
@@ -164,6 +164,7 @@ namespace AppointmentSchedulingReservation
             return false;
         }
 
+        // Check the maximum limit of number of bookings for a room
         public bool CheckMaxSlot(string date, string StaffID, string RoomID)
         {
 
@@ -171,7 +172,6 @@ namespace AppointmentSchedulingReservation
             int countRoomBookings = 0;
             string[] dateParts = date.Split('-');
 
-            // create new date from the parts
             DateTime FromDate = new
                 DateTime(Convert.ToInt32(dateParts[2]),
                 Convert.ToInt32(dateParts[1]),
@@ -211,12 +211,12 @@ namespace AppointmentSchedulingReservation
 
         }
 
+        // Print available rooms to the console based on user input
         public void DisplayAvailableRoom(string dateInput)
         {
             string[] dateParts = dateInput.Split('-');
             int RoomCount = 0;
 
-            // create new date from the parts
             DateTime FromDate = new
                 DateTime(Convert.ToInt32(dateParts[2]),
                 Convert.ToInt32(dateParts[1]),
@@ -232,6 +232,8 @@ namespace AppointmentSchedulingReservation
             {
                 foreach(var y in UserManager.Instance.Slots)
                 {
+                    // Checks the number of bookings that has been made for each room
+                    // on the specified date
                     if(FromDate <= y.StartTime && y.StartTime <= ToDate && x.RoomID == y.RoomID)
                     {
                         RoomCount += 1;

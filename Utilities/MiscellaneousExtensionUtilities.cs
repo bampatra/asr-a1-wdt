@@ -3,6 +3,8 @@ using System.Data.SqlClient;
 
 namespace AppointmentSchedulingReservation
 {
+    /* The following extensions were copied from tutelab materials */
+
     public static class MiscellaneousExtensionUtilities
     {
         public static bool IsWithinRange(this int value, int min, int max) => value >= min && value <= max;

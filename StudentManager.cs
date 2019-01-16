@@ -11,33 +11,26 @@ namespace AppointmentSchedulingReservation
         public List<User> Students { get; }
         public List<Slot> Slots { get;  }
 
-        //private static StaffManager StaffManager { get; } = new StaffManager();
 
         public StudentManager()
         {
             using (var connection = Program.ConnectionString.CreateConnection())
             {
                 var studentCommand = connection.CreateCommand();
-                //var slotCommand = connection.CreateCommand();
 
-                // select all from user where email ends with student.rmit.edu.au
+                // Get all users whose email ends with student.rmit.edu.au
                 studentCommand.CommandText = "select * from [User] where Email like '%_@student%.rmit%.edu%.au%'";
-                //slotCommand.CommandText = "select * from Slot";
 
+                // Create new objects from data gathered and add them to generic List<T>
                 Students = studentCommand.GetDataTable().Select().Select(x =>
                     new User((string)x["UserID"], (string)x["Name"], (string)x["Email"])).ToList();
-
-                //Slots = slotCommand.GetDataTable().Select().Select(x =>
-                //new Slot((string)x["RoomID"], (DateTime)x["StartTime"], (string)x["StaffID"],
-                //(dynamic)x["BookedInStudentID"])).ToList();
-
-                //Slots = StaffManager.UserManager.Slots;
 
                 Slots = UserManager.Instance.Slots;
             }
 
         }
 
+        // Get the instance of the object
         public static StudentManager Instance
         {
             get
@@ -51,11 +44,11 @@ namespace AppointmentSchedulingReservation
 
         }
 
-
-
+        // Get a slot object that matches the given criteria
         public Slot GetSlot(string roomName, DateTime date) => Slots.FirstOrDefault(x => 
         x.RoomID.Equals(roomName) && x.StartTime == date);
 
+        // Book an available slot
         public void MakeBooking(Slot slot, string StudentID)
         {
             using (var connection = Program.ConnectionString.CreateConnection())
@@ -67,6 +60,7 @@ namespace AppointmentSchedulingReservation
 
                     try
                     {
+                        // Update slot in database
                         var command = connection.CreateCommand();
                         command.CommandText =
                             "update Slot set BookedInStudentId = @studentID where " +
@@ -76,6 +70,7 @@ namespace AppointmentSchedulingReservation
                         command.Parameters.AddWithValue("starttime", slot.StartTime);
                         command.ExecuteNonQuery();
 
+                        // Update slot in local memory
                         slot.BookedInStudentID = StudentID;
                         Console.WriteLine("Slot has been booked");
                     }
@@ -93,11 +88,13 @@ namespace AppointmentSchedulingReservation
             }
         }
 
+        // Cancel a booked slot
         public void CancelBooking(Slot slot)
         {
             using (var connection = Program.ConnectionString.CreateConnection())
             {
 
+                // Check if the slot is currently booked or not
                 if (slot.BookedInStudentID is DBNull)
                 {
                     Console.WriteLine("No booking is found for this slot");
@@ -106,6 +103,7 @@ namespace AppointmentSchedulingReservation
                 {
                     connection.Open();
 
+                    // Update slot in database
                     var command = connection.CreateCommand();
                     command.CommandText =
                         "update Slot set BookedInStudentId = null where " +
@@ -114,6 +112,7 @@ namespace AppointmentSchedulingReservation
                     command.Parameters.AddWithValue("starttime", slot.StartTime);
                     command.ExecuteNonQuery();
 
+                    // Update slot in local memory
                     slot.BookedInStudentID = null;
                     Console.WriteLine("Booking has been cancelled");
                 }
@@ -121,12 +120,12 @@ namespace AppointmentSchedulingReservation
             }
         }
 
+        // Check the maximum limit of student bookings
         public bool CheckMaxBooking(string date, string StudentID, string RoomID)
         {
             int countStudentBookings = 0;
             string[] dateParts = date.Split('-');
 
-            // create new date from the parts
             DateTime FromDate = new
                 DateTime(Convert.ToInt32(dateParts[2]),
                 Convert.ToInt32(dateParts[1]),
@@ -144,6 +143,7 @@ namespace AppointmentSchedulingReservation
                 {
                     if (x.BookedInStudentID is string)
                     {
+                        // Checks the number of booking made by the specified student
                         if (x.BookedInStudentID == StudentID) { countStudentBookings += 1; }
                     } 
 

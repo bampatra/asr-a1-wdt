@@ -11,13 +11,11 @@ namespace AppointmentSchedulingReservation
             {
                 string[] dateParts = date.Split('-');
 
-                // create new date from the parts
                 DateTime testDate = new
                     DateTime(Convert.ToInt32(dateParts[2]),
                     Convert.ToInt32(dateParts[1]),
                     Convert.ToInt32(dateParts[0]));
-
-                //Console.WriteLine(testDate);
+                    
                 return true;
 
             }
@@ -43,7 +41,6 @@ namespace AppointmentSchedulingReservation
                 else
                     if (9 <= dateTime.Hour && dateTime.Hour <= 13)
                 {
-                    //Console.WriteLine(dateTime);
                     return true;
                 }
                 else
